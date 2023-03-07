@@ -15,10 +15,16 @@ function! Send_keys_to_Tmux(keys)
     call <SID>Tmux_Vars()
   endif
 
-  if exists("g:tslime_pre_command")
-    call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
+  if has_key(g:tslime, "pane")
+    if exists("g:tslime_pre_command")
+      call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
+    endif
+    call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
+  else
+    echohl WarningMsg
+    echo "No tmux panes found"
+    echohl None
   endif
-  call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
 endfunction
 
 " Main function.
@@ -114,13 +120,18 @@ function! s:AutoTmuxPanes()
   endif
   " have to do this loop because max(valid_panes) doesn't work
   let biggest_height = 0
+  let biggest_pane = -1
   for [index, height] in items(valid_panes)
     if height >= biggest_height
       let biggest_height = height
       let biggest_pane = index
     endif
   endfor
-  return [biggest_pane]
+  if biggest_pane != -1
+    return [biggest_pane]
+  else
+    return []
+  endif
 endfunction
 
 " set tslime.vim variables
@@ -157,9 +168,11 @@ function! s:Tmux_Vars()
   if len(panes) == 1
     let g:tslime['pane'] = panes[0]
   else
-    let g:tslime['pane'] = input("pane number: ", "", "customlist,Tmux_Pane_Numbers")
-    if g:tslime['pane'] == ''
-      let g:tslime['pane'] = panes[0]
+    if !get(g:, "tslime_autoset_pane", 0)
+      let g:tslime['pane'] = input("pane number: ", "", "customlist,Tmux_Pane_Numbers")
+      if g:tslime['pane'] == ''
+        let g:tslime['pane'] = panes[0]
+      endif
     endif
   endif
 endfunction
