@@ -15,6 +15,9 @@ function! Send_keys_to_Tmux(keys)
     call <SID>Tmux_Vars()
   endif
 
+  if exists("g:tslime_pre_command")
+    call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
+  endif
   call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
 endfunction
 

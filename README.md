@@ -36,6 +36,15 @@ the pane in the current window with the largest height, put the following in you
 let g:tslime_autoset_pane = 1
 ```
 
+If you want a command to be sent to tmux before your actual command, put the following
+into your config:
+
+```vim
+let g:tslime_pre_command = "C-c"
+```
+
+This example will empty whatever is in the prompt or put tmux into normal mode.
+
 Setting Keybindings
 -------------------
 
