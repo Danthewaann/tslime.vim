@@ -21,9 +21,9 @@ function! Send_keys_to_Tmux(keys)
     endif
     call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
   else
-    echohl WarningMsg
-    echo "No tmux panes found"
-    echohl None
+    call system("tmux split-window -d -h -l 40%")
+    call <SID>Tmux_Vars()
+    call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
   endif
 endfunction
 
