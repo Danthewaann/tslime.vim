@@ -16,6 +16,8 @@ function! Send_keys_to_Tmux(keys)
   endif
 
   if has_key(g:tslime, "pane")
+    " Ensure that the current pane is zoomed out
+    call system("tmux list-panes -F '#F' | grep -q Z && tmux resize-pane -Z")
     if exists("g:tslime_pre_command")
       call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
     endif
