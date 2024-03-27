@@ -16,15 +16,12 @@ function! Send_keys_to_Tmux(keys)
   endif
 
   if has_key(g:tslime, "pane")
-    " Ensure that the current pane is zoomed out
-    call system("tmux list-panes -F '#F' | grep -q Z && tmux resize-pane -Z")
     if exists("g:tslime_pre_command")
       call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
     endif
     call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
   else
-    call system("tmux split-window -d -h -l 40%")
-    call <SID>Tmux_Vars()
+    let g:tslime["pane"] = 0
     call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
   endif
 endfunction
@@ -149,17 +146,11 @@ function! s:Tmux_Vars()
     let g:tslime['session'] = input("session name: ", "", "customlist,Tmux_Session_Names")
   endwhile
 
-  let windows = s:TmuxWindows()
-  if len(windows) == 1
-    let window = windows[0]
-  else
-    let window = input("window name: ", "", "customlist,Tmux_Window_Names")
-    if window == ''
-      let window = windows[0]
-    endif
-  endif
+  " Create a new window to run the command in
+  call system('tmux new-window -c "#{pane_current_path}"')
+  let window = s:TmuxWindows()[-1]
 
-  let g:tslime['window'] =  substitute(window, ":.*$" , '', 'g')
+  let g:tslime['window'] = substitute(window, ":.*$" , '', 'g')
 
   if exists("g:tslime_autoset_pane") && g:tslime_autoset_pane
     let panes = s:AutoTmuxPanes()
