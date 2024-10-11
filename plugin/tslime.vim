@@ -147,7 +147,7 @@ function! s:Tmux_Vars()
   endwhile
 
   " Create a new window to run the command in
-  call system('tmux new-window -c "#{pane_current_path}"')
+  call system('tmux new-window -a -c "#{pane_current_path}"')
   let window = s:TmuxWindows()[-1]
 
   let g:tslime['window'] = substitute(window, ":.*$" , '', 'g')
