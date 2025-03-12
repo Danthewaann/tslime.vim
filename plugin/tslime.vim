@@ -146,12 +146,17 @@ function! s:Tmux_Vars()
     let g:tslime['session'] = input("session name: ", "", "customlist,Tmux_Session_Names")
   endwhile
 
-  " Create a new window to run the command in
-  let current_window = system("tmux display-message -p '#I'")
-  call system('tmux new-window -a -c "#{pane_current_path}"')
+  " Create a new window or reuse an existing one to run the command in
   let windows = s:TmuxWindows()
-  let window = windows[current_window]
+  let current_window = system("tmux display-message -p '#I'")
+  let next_window = current_window + 1
+  if index(windows, string(next_window)) < 0
+    call system('tmux new-window -a -c "#{pane_current_path}"')
+  else
+    call system('tmux select-window -t ' . next_window)
+  endif
 
+  let window = next_window
   let g:tslime['window'] = substitute(window, ":.*$" , '', 'g')
 
   if exists("g:tslime_autoset_pane") && g:tslime_autoset_pane
