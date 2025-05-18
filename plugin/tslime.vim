@@ -15,22 +15,18 @@ function! Send_keys_to_Tmux(keys)
     call <SID>Tmux_Vars()
   endif
 
-  if has_key(g:tslime, "pane")
-    if exists("g:tslime_pre_command")
-      call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
-    endif
-    call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
-  else
-    let g:tslime["pane"] = 0
-    call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
+  let g:tslime["pane"] = 0
+  if exists("g:tslime_pre_command")
+    call system("tmux send-keys -t " . s:tmux_target() . " " . g:tslime_pre_command)
   endif
+  call system("tmux send-keys -t " . s:tmux_target() . " " . a:keys)
 endfunction
 
 " Main function.
 " Use it in your script if you want to send text to a tmux session.
 function! Send_to_Tmux(text)
   if exists("g:tslime_autoset_pane") && g:tslime_autoset_pane
-    call <SID>Tmux_Vars() 
+    call <SID>Tmux_Vars()
   endif
   call Send_keys_to_Tmux('"'.escape(a:text, '\"$').'"')
 endfunction
@@ -108,7 +104,7 @@ function! s:AutoTmuxPanes()
   let c = 0
   for heights in pane_heights
     let valid_panes[c] = str2nr(heights)
-    let c += 1 
+    let c += 1
   endfor
   " If we're in the active session & window, filter away current pane from
   " possibilities
